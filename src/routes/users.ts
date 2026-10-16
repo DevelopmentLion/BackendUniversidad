@@ -1,12 +1,12 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
+import { hashPassword, comparePassword } from '../utils/hash';
 import { mockUsers } from '../services/data';
 import { User, AuthResponse } from '../types';
-import { generateToken, authMiddleware, Variables } from '../middleware/auth';
+import { generateToken, authMiddleware, Variables, Env, AppContext } from '../middleware/auth';
 
-const usersRouter = new Hono<{ Variables: Variables }>();
+const usersRouter = new Hono<{ Variables: Variables; Bindings: Env }>();
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -35,14 +35,14 @@ usersRouter.post('/login', zValidator('json', loginSchema), async (c) => {
     return c.json({ error: 'Invalid credentials' }, 401);
   }
 
-  const isValidPassword = await bcrypt.compare(password, user.password);
+  const isValidPassword = await comparePassword(password, user.password);
 
   if (!isValidPassword) {
     return c.json({ error: 'Invalid credentials' }, 401);
   }
 
   const { password: _, ...userWithoutPassword } = user;
-  const token = generateToken(user.id);
+  const token = await generateToken(user.id, user.role, { JWT_SECRET: c.env.JWT_SECRET });
 
   const response: AuthResponse = {
     token,
@@ -61,12 +61,13 @@ usersRouter.post('/register', zValidator('json', registerSchema), async (c) => {
     return c.json({ error: 'Email already registered' }, 400);
   }
 
-  const hashedPassword = await bcrypt.hash(data.password, 10);
+  const hashedPassword = await hashPassword(data.password);
 
   const newUser: User = {
     id: String(mockUsers.length + 1),
     ...data,
     password: hashedPassword,
+    role: 'student',
     courses: 0,
     average: 0,
     joinedDate: new Date().toISOString().split('T')[0]
@@ -75,7 +76,7 @@ usersRouter.post('/register', zValidator('json', registerSchema), async (c) => {
   mockUsers.push(newUser);
 
   const { password: _, ...userWithoutPassword } = newUser;
-  const token = generateToken(newUser.id);
+  const token = await generateToken(newUser.id, newUser.role, { JWT_SECRET: c.env.JWT_SECRET });
 
   const response: AuthResponse = {
     token,
@@ -85,7 +86,7 @@ usersRouter.post('/register', zValidator('json', registerSchema), async (c) => {
   return c.json(response, 201);
 });
 
-usersRouter.get('/profile', authMiddleware, async (c) => {
+usersRouter.get('/profile', authMiddleware, async (c: AppContext) => {
   const userId = c.get('userId');
 
   if (!userId) {
@@ -102,7 +103,7 @@ usersRouter.get('/profile', authMiddleware, async (c) => {
   return c.json(userWithoutPassword);
 });
 
-usersRouter.put('/profile', authMiddleware, async (c) => {
+usersRouter.put('/profile', authMiddleware, async (c: AppContext) => {
   const userId = c.get('userId');
 
   if (!userId) {

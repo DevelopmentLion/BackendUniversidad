@@ -1,0 +1,11 @@
+name = "universidad-backend"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Variables de entorno que se pueden configurar en Cloudflare
+# JWT_SECRET se configurará como secreto en Cloudflare dashboard
+
+# Configuración para el adaptador
+[[build]]
+command = "npm run build"

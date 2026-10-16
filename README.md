@@ -1,14 +1,15 @@
 # Universidad Backend
 
-Backend API para el sistema universitario construido con TypeScript y Hono.
+Backend API para el sistema universitario construido con TypeScript y Hono, desplegado en Cloudflare Workers.
 
 ## Tecnologías
 
 - TypeScript
-- Hono (Framework web)
+- Hono (Framework web para Cloudflare Workers)
 - Zod (Validación de esquemas)
-- bcryptjs (Hashing de contraseñas)
-- jsonwebtoken (Autenticación JWT)
+- Web Crypto API (Hashing de contraseñas compatible con Cloudflare)
+- jose (Autenticación JWT compatible con Cloudflare)
+- Cloudflare Workers (Runtime serverless)
 
 ## Instalación
 
@@ -18,18 +19,23 @@ npm install
 
 ## Variables de Entorno
 
-Crear un archivo `.env` en la raíz del proyecto:
+Para desarrollo local, crea un archivo `.dev.vars` en la raíz del proyecto:
 
 ```
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
-PORT=3001
+```
+
+Para producción en Cloudflare, configura el secreto en el dashboard de Cloudflare o usando wrangler:
+
+```bash
+wrangler secret put JWT_SECRET
 ```
 
 ## Scripts
 
-- `npm run dev` - Inicia el servidor en modo desarrollo con hot reload
+- `npm run dev` - Inicia el servidor de desarrollo local con wrangler
 - `npm run build` - Compila el proyecto TypeScript
-- `npm start` - Inicia el servidor en producción
+- `npm run deploy` - Despliega a Cloudflare Workers
 
 ## Endpoints
 
@@ -85,10 +91,18 @@ Authorization: Bearer <token>
 
 ## Ejemplo de Uso
 
+### Desarrollo Local
+
+```bash
+npm run dev
+```
+
+Esto iniciará el servidor en `http://localhost:8787`
+
 ### Login
 
 ```bash
-curl -X POST http://localhost:3001/api/auth/login \
+curl -X POST http://localhost:8787/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"juan.perez@universidad.edu","password":"password123"}'
 ```
@@ -96,12 +110,34 @@ curl -X POST http://localhost:3001/api/auth/login \
 ### Obtener Cursos
 
 ```bash
-curl http://localhost:3001/api/courses
+curl http://localhost:8787/api/courses
 ```
 
 ### Obtener Perfil (requiere token)
 
 ```bash
-curl http://localhost:3001/api/users/profile \
+curl http://localhost:8787/api/users/profile \
   -H "Authorization: Bearer <token>"
 ```
+
+## Despliegue en Cloudflare Workers
+
+### 1. Autenticarse con Cloudflare
+
+```bash
+npx wrangler login
+```
+
+### 2. Configurar secreto JWT
+
+```bash
+wrangler secret put JWT_SECRET
+```
+
+### 3. Desplegar
+
+```bash
+npm run deploy
+```
+
+El backend estará disponible en una URL como: `https://universidad-backend.workers.dev`

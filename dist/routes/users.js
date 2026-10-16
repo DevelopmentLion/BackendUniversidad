@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
+import { hashPassword, comparePassword } from '../utils/hash';
 import { mockUsers } from '../services/data';
 import { generateToken, authMiddleware } from '../middleware/auth';
 const usersRouter = new Hono();
@@ -27,12 +27,12 @@ usersRouter.post('/login', zValidator('json', loginSchema), async (c) => {
     if (!user) {
         return c.json({ error: 'Invalid credentials' }, 401);
     }
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await comparePassword(password, user.password);
     if (!isValidPassword) {
         return c.json({ error: 'Invalid credentials' }, 401);
     }
     const { password: _, ...userWithoutPassword } = user;
-    const token = generateToken(user.id);
+    const token = await generateToken(user.id, user.role, { JWT_SECRET: c.env.JWT_SECRET });
     const response = {
         token,
         user: userWithoutPassword
@@ -45,18 +45,19 @@ usersRouter.post('/register', zValidator('json', registerSchema), async (c) => {
     if (existingUser) {
         return c.json({ error: 'Email already registered' }, 400);
     }
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await hashPassword(data.password);
     const newUser = {
         id: String(mockUsers.length + 1),
         ...data,
         password: hashedPassword,
+        role: 'student',
         courses: 0,
         average: 0,
         joinedDate: new Date().toISOString().split('T')[0]
     };
     mockUsers.push(newUser);
     const { password: _, ...userWithoutPassword } = newUser;
-    const token = generateToken(newUser.id);
+    const token = await generateToken(newUser.id, newUser.role, { JWT_SECRET: c.env.JWT_SECRET });
     const response = {
         token,
         user: userWithoutPassword

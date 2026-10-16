@@ -1,15 +1,14 @@
 import { Hono } from 'hono';
-import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { authMiddleware, Variables } from './middleware/auth';
+import { Variables, Env } from './middleware/auth';
 import usersRouter from './routes/users';
 import coursesRouter from './routes/courses';
 import sessionsRouter from './routes/sessions';
 import gradesRouter from './routes/grades';
 import activitiesRouter from './routes/activities';
 
-const app = new Hono<{ Variables: Variables }>();
+const app = new Hono<{ Variables: Variables; Bindings: Env }>();
 
 app.use('*', cors({
   origin: '*',
@@ -41,11 +40,5 @@ app.route('/api/activities', activitiesRouter);
 
 app.route('/api/auth', usersRouter);
 
-const port = parseInt(process.env.PORT || '3001');
-
-console.log(`Server running on port ${port}`);
-
-serve({
-  fetch: app.fetch,
-  port
-});
+// Export para Cloudflare Workers
+export default app;

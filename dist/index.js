@@ -32,9 +32,5 @@ app.route('/api/sessions', sessionsRouter);
 app.route('/api/grades', gradesRouter);
 app.route('/api/activities', activitiesRouter);
 app.route('/api/auth', usersRouter);
-const port = parseInt(process.env.PORT || '3001');
-console.log(`Server running on port ${port}`);
-export default {
-    port,
-    fetch: app.fetch
-};
+// Export para Cloudflare Workers
+export default app;

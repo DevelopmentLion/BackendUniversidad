@@ -4,7 +4,8 @@ export const mockUsers = [
         firstName: 'Juan',
         lastName: 'Pérez',
         email: 'juan.perez@universidad.edu',
-        password: '$2a$10$abcdefghijklmnopqrstuv', // bcrypt hash
+        password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', // SHA-256 hash of 'password123'
+        role: 'student',
         phone: '+52 55 1234 5678',
         dateOfBirth: '2000-05-15',
         address: 'Calle Principal 123, Ciudad de México',
@@ -14,6 +15,40 @@ export const mockUsers = [
         courses: 5,
         average: 8.5,
         joinedDate: '2023-08-15'
+    },
+    {
+        id: '2',
+        firstName: 'María',
+        lastName: 'García',
+        email: 'maria.garcia@universidad.edu',
+        password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+        role: 'teacher',
+        phone: '+52 55 8765 4321',
+        dateOfBirth: '1985-03-20',
+        address: 'Av. Reforma 456, Ciudad de México',
+        bio: 'Profesora de Ciencias de la Computación',
+        language: 'es',
+        timezone: 'America/Mexico_City',
+        courses: 3,
+        average: 0,
+        joinedDate: '2020-01-15'
+    },
+    {
+        id: '3',
+        firstName: 'Carlos',
+        lastName: 'López',
+        email: 'carlos.lopez@universidad.edu',
+        password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+        role: 'teacher',
+        phone: '+52 55 1111 2222',
+        dateOfBirth: '1982-07-10',
+        address: 'Calle 5 de Mayo 789, Ciudad de México',
+        bio: 'Profesor de Estructuras de Datos',
+        language: 'es',
+        timezone: 'America/Mexico_City',
+        courses: 2,
+        average: 0,
+        joinedDate: '2019-08-20'
     }
 ];
 export const mockCourses = [

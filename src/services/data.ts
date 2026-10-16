@@ -6,7 +6,7 @@ export const mockUsers: User[] = [
     firstName: 'Juan',
     lastName: 'Pérez',
     email: 'juan.perez@universidad.edu',
-    password: '$2a$10$abcdefghijklmnopqrstuv', // bcrypt hash
+    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', // SHA-256 hash of 'password123'
     role: 'student',
     phone: '+52 55 1234 5678',
     dateOfBirth: '2000-05-15',
@@ -23,7 +23,7 @@ export const mockUsers: User[] = [
     firstName: 'María',
     lastName: 'García',
     email: 'maria.garcia@universidad.edu',
-    password: '$2a$10$abcdefghijklmnopqrstuv',
+    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
     role: 'teacher',
     phone: '+52 55 8765 4321',
     dateOfBirth: '1985-03-20',
@@ -40,7 +40,7 @@ export const mockUsers: User[] = [
     firstName: 'Carlos',
     lastName: 'López',
     email: 'carlos.lopez@universidad.edu',
-    password: '$2a$10$abcdefghijklmnopqrstuv',
+    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
     role: 'teacher',
     phone: '+52 55 1111 2222',
     dateOfBirth: '1982-07-10',
